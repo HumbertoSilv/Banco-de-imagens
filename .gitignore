@@ -1,3 +1,5 @@
 venv/
 **.env
 **.vscode
+upload/
+**__pycache__
