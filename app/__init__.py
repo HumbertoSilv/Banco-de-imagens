@@ -15,15 +15,12 @@ def upload():
     mock = save_file()
     try:
         if not mock:
-
             return jsonify({"msg": "No file uploadded"}), 413
 
         elif mock == "existing file":
-
             return jsonify({"msg": "FAILED : existing file"}), 409
 
-    except FileNotFoundError as _:
-
+    except FileNotFoundError:
         return jsonify({"msg": "FAILED : unsupported file type"}), 415
 
     return jsonify({"msg": "Upload success"}), 201
@@ -31,7 +28,6 @@ def upload():
 
 @app.get("/files")
 def list_files():
-
     if not get_files():
         return jsonify({"msg": "No files"}), 400
 
@@ -44,8 +40,7 @@ def list_files_by_type(type):
         if not get_type_files(type):
             return jsonify({"msg": "Files not found"}), 404
 
-    except FileNotFoundError as _:
-
+    except FileNotFoundError:
         return jsonify({"msg": "FAILED : unsupported file type"}), 415
 
     return jsonify(get_type_files(type)), 200
@@ -53,17 +48,17 @@ def list_files_by_type(type):
 
 @app.get("/download/<file_name>")
 def download(file_name):
-
     files = os.listdir(f"./upload/{file_name[-3:].upper()}")
-    try:
 
+    try:
         if not (file_name in files):
             return jsonify({"msg": "filename not found"}), 404
 
-    except FileNotFoundError as _:
+    except FileNotFoundError:
         return jsonify({"msg": "filename not found"}), 404
 
-    return send_from_directory(directory=f"../upload/{file_name[-3:].upper()}", path=file_name, as_attachment=True )
+    return send_from_directory(directory=f"../upload/{file_name[-3:].upper()}",
+                               path=file_name, as_attachment=True)
 
 
 @app.get("/download-zip")
@@ -71,5 +66,5 @@ def download_dir_as_zip():
     try:
         return download_zip()
 
-    except TypeError as _:
+    except TypeError:
         return jsonify({"msg": "Incorrect arguments, check them out."}), 404

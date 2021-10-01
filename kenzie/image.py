@@ -15,7 +15,10 @@ MAX_CONTENT_LENGTH = int(environ.get('MAX_CONTENT_LENGTH'))
 
 
 def save_file() -> bool:
-    """Capture files from request.files, name them using secure_filename, save in a specific folder."""
+    """
+    Capture files from request.files, name them using
+    secure_filename, save in a specific folder.
+    """
 
     len_file = int(request.headers["Content-Length"])
     files_list = list(request.files)
@@ -25,15 +28,15 @@ def save_file() -> bool:
 
     for f in files_list:
         received_file = request.files[f]
-
         filename = secure_filename(received_file.filename)
-
-        file_path = safe_join(f"{FILES_DIRECTORY}/{filename.split('.')[-1].upper()}", filename)
-
-        files = os.listdir(f"{FILES_DIRECTORY}/{filename.split('.')[-1].upper()}")
+        file_path = safe_join(
+            f"{FILES_DIRECTORY}/{filename.split('.')[-1].upper()}", filename
+            )
+        files = os.listdir(
+            f"{FILES_DIRECTORY}/{filename.split('.')[-1].upper()}"
+            )
 
         if filename in files:
-
             return "existing file"
 
         received_file.save(file_path)
@@ -42,7 +45,10 @@ def save_file() -> bool:
 
 
 def get_files():
-    """Searches all files within a specified folder and returns a list of all of them. If the folder is empty it returns False."""
+    """
+        Searches all files within a specified folder and returns
+        a list of all of them. If the folder is empty it returns False.
+    """
 
     files = os.listdir(FILES_DIRECTORY)
     all_files = []
@@ -59,7 +65,11 @@ def get_files():
 
 
 def get_type_files(type: str):
-    """Searches all files of a specified extension in a specified folder and returns a list of all of them. If the folder is empty, it returns False."""
+    """
+        Searches all files of a specified extension in a specified
+        folder and returns a list of all of them. If the folder is
+        empty, it returns False.
+    """
 
     files = os.listdir(f"{FILES_DIRECTORY}/{type.upper()}")
 
@@ -71,15 +81,19 @@ def get_type_files(type: str):
 
 def download_zip():
     """
-    It captures the file type and compression level, creates a Zip file and returns the file for download.
+        It captures the file type and compression level, creates a Zip file and
+        returns the file for download.
     """
 
     file_type = request.args.get("file_type")
     compression_rate = int(request.args.get("compression_rate"))
     files = os.listdir(f"{FILES_DIRECTORY}/{file_type.upper()}")
 
-    with ZipFile(f'./ZIP/zip_{file_type.upper()}.zip', 'w', compresslevel=compression_rate) as myzip:
+    with ZipFile(f'./ZIP/zip_{file_type.upper()}.zip', 'w',
+                 compresslevel=compression_rate) as myzip:
         for i in files:
             myzip.write(f'./upload/{file_type.upper()}/{i}')
 
-    return send_from_directory("../ZIP", f'zip_{file_type.upper()}.zip', as_attachment=True)
+    return send_from_directory(
+        "../ZIP", f'zip_{file_type.upper()}.zip', as_attachment=True
+        )
